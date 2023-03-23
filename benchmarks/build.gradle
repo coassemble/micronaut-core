@@ -35,7 +35,7 @@ dependencies {
     jmh libs.jmh.core
 }
 jmh {
-    includes = ['io.micronaut.http.server.StartupBenchmark']
+    includes = ['io.micronaut.http.server.stack.FullHttpStackBenchmark']
     duplicateClassesStrategy = DuplicatesStrategy.WARN
 }
 

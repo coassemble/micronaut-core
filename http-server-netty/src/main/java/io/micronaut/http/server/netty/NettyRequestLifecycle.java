@@ -157,7 +157,7 @@ final class NettyRequestLifecycle extends RequestLifecycle {
     }
 
     private boolean shouldReadBody(RouteMatch<?> routeMatch) {
-        if (!HttpMethod.permitsRequestBody(request().getMethod())) {
+        if (!routeMatch.getRouteInfo().isPermitsRequestBody()) {
             return false;
         }
         if (!(nettyRequest.getNativeRequest() instanceof StreamedHttpRequest)) {
@@ -181,7 +181,7 @@ final class NettyRequestLifecycle extends RequestLifecycle {
             return true;
         }
         // Might be some body parts
-        return !routeMatch.isExecutable();
+        return !routeMatch.isFulfilled();
     }
 
     private static boolean hasArg(MethodBasedRouteMatch<?, ?> methodBasedRouteMatch, Class<?> type) {

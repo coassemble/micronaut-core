@@ -15,9 +15,6 @@
  */
 package io.micronaut.http.bind.binders;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import io.micronaut.core.annotation.AnnotationMetadata;
 import io.micronaut.core.beans.BeanIntrospection;
 import io.micronaut.core.beans.BeanProperty;
@@ -34,6 +31,12 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.RequestBean;
 import io.micronaut.http.bind.RequestBinderRegistry;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Used to bind Bindable parameters to a Bean object.
@@ -121,7 +124,7 @@ public class RequestBeanAnnotationBinder<T> extends AbstractAnnotatedArgumentBin
 
     private Optional<Object> getBindableResult(ArgumentConversionContext<Object> conversionContext, HttpRequest<?> source) {
         Argument<Object> argument = conversionContext.getArgument();
-        Optional<ArgumentBinder<Object, HttpRequest<?>>> binder = requestBinderRegistry.findArgumentBinder(argument, source);
+        Optional<ArgumentBinder<Object, HttpRequest<?>>> binder = requestBinderRegistry.findArgumentBinder(argument);
         if (!binder.isPresent()) {
             throw new UnsatisfiedArgumentException(argument);
         }

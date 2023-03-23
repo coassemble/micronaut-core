@@ -66,28 +66,29 @@ public class WebSocketStateBinderRegistry implements ArgumentBinderRegistry<WebS
     }
 
     @Override
-    public <T> Optional<ArgumentBinder<T, WebSocketState>> findArgumentBinder(Argument<T> argument, WebSocketState source) {
-        Optional<ArgumentBinder<T, HttpRequest<?>>> argumentBinder = requestBinderRegistry.findArgumentBinder(argument, source.getOriginatingRequest());
+    public <T> Optional<ArgumentBinder<T, WebSocketState>> findArgumentBinder(Argument<T> argument) {
+        Optional<ArgumentBinder<T, HttpRequest<?>>> argumentBinder = requestBinderRegistry.findArgumentBinder(argument);
         if (argumentBinder.isPresent()) {
             ArgumentBinder<T, HttpRequest<?>> adapted = argumentBinder.get();
 
             boolean isParameterBinder = adapted instanceof AnnotatedArgumentBinder && ((AnnotatedArgumentBinder) adapted).getAnnotationType() == QueryValue.class;
             if (!isParameterBinder) {
-                return Optional.of((context, source1) -> adapted.bind(context, source.getOriginatingRequest()));
+                return Optional.of((context, source1) -> adapted.bind(context, source1.getOriginatingRequest()));
             }
         }
 
-        ArgumentBinder binder = byType.get(argument.getType());
+        ArgumentBinder<T, WebSocketState> binder = (ArgumentBinder<T, WebSocketState>) byType.get(argument.getType());
         if (binder != null) {
-            //noinspection unchecked
             return Optional.of(binder);
-        } else {
+        }
+        return Optional.of((context, source) -> {
             ConvertibleValues<Object> uriVariables = source.getSession().getUriVariables();
             if (uriVariables.contains(argument.getName())) {
-                return Optional.of((context, s) -> () -> uriVariables.get(argument.getName(), argument));
-            } else {
-                return Optional.of((context, s) -> (ArgumentBinder.BindingResult<T>) queryValueArgumentBinder.bind((ArgumentConversionContext<Object>) context, s.getOriginatingRequest()));
+                Optional<T> val = uriVariables.get(argument.getName(), argument);
+                return val.isEmpty() ? ArgumentBinder.BindingResult.UNSATISFIED : () -> val;
             }
-        }
+            return (ArgumentBinder.BindingResult<T>) queryValueArgumentBinder.bind((ArgumentConversionContext<Object>) context, source.getOriginatingRequest());
+        });
+
     }
 }

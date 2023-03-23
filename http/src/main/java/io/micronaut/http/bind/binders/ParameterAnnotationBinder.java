@@ -66,7 +66,7 @@ public class ParameterAnnotationBinder<T> extends AbstractAnnotatedArgumentBinde
         BindingResult<T> result = queryValueArgumentBinder.bind(context, source);
 
         Optional<T> val = result.getValue();
-        if (!val.isPresent() && !hasAnnotation) {
+        if (val.isEmpty() && !hasAnnotation) {
             // attributes are sometimes added by filters, so this should return unsatisfied if not found
             // so it can be picked up after the filters are executed
             result = doBind(context, source.getAttributes(), parameterName, BindingResult.UNSATISFIED);
@@ -81,7 +81,7 @@ public class ParameterAnnotationBinder<T> extends AbstractAnnotatedArgumentBinde
 
         // If there is still no value at this point and no annotation is specified and
         // the HTTP method allows a request body try and bind from the body
-        if (!result.getValue().isPresent() && !hasAnnotation && permitsRequestBody) {
+        if (result.getValue().isEmpty() && !hasAnnotation && permitsRequestBody) {
             Optional<ConvertibleValues> body = source.getBody(ConvertibleValues.class);
             if (body.isPresent()) {
                 result = doBind(context, body.get(), parameterName);

@@ -77,8 +77,7 @@ public class InputStreamBodyBinder implements NonBlockingBodyArgumentBinder<Inpu
     @SuppressWarnings("unchecked")
     @Override
     public BindingResult<InputStream> bind(ArgumentConversionContext<InputStream> context, HttpRequest<?> source) {
-        if (source instanceof NettyHttpRequest) {
-            NettyHttpRequest nettyHttpRequest = (NettyHttpRequest) source;
+        if (source instanceof NettyHttpRequest<?> nettyHttpRequest) {
             io.netty.handler.codec.http.HttpRequest nativeRequest = nettyHttpRequest.getNativeRequest();
             if (nativeRequest instanceof StreamedHttpRequest) {
                 PipedOutputStream outputStream = new PipedOutputStream();

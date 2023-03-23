@@ -37,7 +37,6 @@ import reactor.core.publisher.Sinks;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -245,12 +244,13 @@ final class FormRouteCompleter extends BaseRouteCompleter {
         if (!execute) {
             String argumentName = argument.getName();
             if (!routeMatch.isSatisfied(argumentName)) {
-                Object fulfillParamter = value.get();
-                routeMatch = routeMatch.fulfill(Collections.singletonMap(argumentName, fulfillParamter));
+                // Fulfill the value on execute when the body is fully read
+                // The file uploads needs to be completed
+                routeMatch.fulfillOnExecute(argumentName, value);
                 // we need to release the data here. However, if the route argument is a
                 // ByteBuffer, we need to retain the data until the route is executed. Adding
                 // the data to the request ensures it is cleaned up after the route completes.
-                if (!alwaysAddContent && fulfillParamter instanceof ByteBufHolder holder) {
+                if (!alwaysAddContent && value.get() instanceof ByteBufHolder holder) {
                     request.addContent(holder);
                 }
             }
@@ -258,7 +258,7 @@ final class FormRouteCompleter extends BaseRouteCompleter {
                 //accounting for the previous request
                 request(1);
             }
-            if (routeMatch.isExecutable()) {
+            if (routeMatch.isFulfilled()) {
                 execute = true;
             }
         }

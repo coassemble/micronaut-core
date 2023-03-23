@@ -39,12 +39,11 @@ public interface ArgumentBinderRegistry<S> {
     }
 
     /**
-     * Locate an {@link ArgumentBinder} for the given argument and source type.
+     * Locate an {@link ArgumentBinder} for the given argument.
      *
      * @param argument The argument
-     * @param source   The source
      * @param <T>      The argument type
      * @return An {@link Optional} of {@link ArgumentBinder}
      */
-    <T> Optional<ArgumentBinder<T, S>> findArgumentBinder(Argument<T> argument, S source);
+    <T> Optional<ArgumentBinder<T, S>> findArgumentBinder(Argument<T> argument);
 }

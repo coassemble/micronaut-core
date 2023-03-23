@@ -17,32 +17,19 @@ package io.micronaut.web.router;
 
 import io.micronaut.core.annotation.Nullable;
 import io.micronaut.http.HttpMethod;
-import io.micronaut.http.HttpRequest;
-import io.micronaut.http.MediaType;
 import io.micronaut.http.uri.UriMatchTemplate;
+import io.micronaut.http.uri.UriMatcher;
 
 import java.net.URI;
-import java.util.function.Predicate;
+import java.util.Optional;
 
 /**
  * Represents a {@link Route} that matches a {@link URI}.
  *
- * @author Graeme Rocher
- * @since 1.0
+ * @author Denis Stepanov
+ * @since 4.0.0
  */
-public interface UriRoute extends Route, Comparable<UriRoute> {
-
-    @Override
-    UriRouteInfo<Object, Object> toRouteInfo();
-
-    /**
-     * Defines routes nested within this route.
-     *
-     * @param nested The nested routes
-     * @return This route
-     */
-    @Override
-    UriRoute nest(Runnable nested);
+public interface UriRouteInfo<T, R> extends MethodBasedRouteInfo<T, R>, RequestMatcher, UriMatcher, Comparable<UriRouteInfo<T, R>> {
 
     /**
      * @return The HTTP method for this route
@@ -54,28 +41,25 @@ public interface UriRoute extends Route, Comparable<UriRoute> {
      */
     UriMatchTemplate getUriMatchTemplate();
 
+    /**
+     * Match this route within the given URI and produce a {@link RouteMatch} if a match is found.
+     *
+     * @param uri The URI The URI
+     * @return An {@link Optional} of {@link RouteMatch}
+     */
     @Override
-    UriRoute consumes(MediaType... mediaType);
-
-    @Override
-    UriRoute produces(MediaType... mediaType);
-
-    @Override
-    UriRoute consumesAll();
-
-    @Override
-    UriRoute where(Predicate<HttpRequest<?>> condition);
-
-    @Override
-    UriRoute body(String argument);
+    default Optional<UriRouteMatch<T, R>> match(URI uri) {
+        return match(uri.toString());
+    }
 
     /**
-     * The exposed port that the route applies to.
+     * Match this route within the given URI and produce a {@link RouteMatch} if a match is found.
      *
-     * @param port The port
-     * @return The route
+     * @param uri The URI
+     * @return An {@link Optional} of {@link RouteMatch}
      */
-    UriRoute exposedPort(int port);
+    @Override
+    Optional<UriRouteMatch<T, R>> match(String uri);
 
     /**
      * @return The port the route listens to, or null if the default port

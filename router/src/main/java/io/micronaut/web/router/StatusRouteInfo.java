@@ -16,23 +16,17 @@
 package io.micronaut.web.router;
 
 import io.micronaut.core.annotation.Nullable;
-import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
-import io.micronaut.http.MediaType;
 
-import java.util.function.Predicate;
+import java.util.Optional;
 
 /**
- * Represents a {@link Route} that matches a status.
+ * Represents a {@link RouteInfo} that matches a status.
  *
- * @author Graeme Rocher
- * @since 1.0
+ * @author Denis Stepanov
+ * @since 4.0.0
  */
-public interface StatusRoute extends Route {
-
-    @Override
-    StatusRouteInfo<Object, Object> toRouteInfo();
-
+public interface StatusRouteInfo<T, R> extends MethodBasedRouteInfo<T, R>, RequestMatcher {
     /**
      * @return The type the exception originates from. Null if the error route is global.
      */
@@ -44,12 +38,21 @@ public interface StatusRoute extends Route {
      */
     HttpStatus status();
 
-    @Override
-    StatusRoute consumes(MediaType... mediaType);
+    /**
+     * Match the given HTTP status.
+     *
+     * @param status The status to match
+     * @return The route match
+     */
+    Optional<RouteMatch<R>> match(HttpStatus status);
 
-    @Override
-    StatusRoute nest(Runnable nested);
+    /**
+     * Match the given HTTP status.
+     *
+     * @param originatingClass The class where the error originates from
+     * @param status The status to match
+     * @return The route match
+     */
+    Optional<RouteMatch<R>> match(Class<?> originatingClass, HttpStatus status);
 
-    @Override
-    StatusRoute where(Predicate<HttpRequest<?>> condition);
 }

@@ -148,8 +148,7 @@ public class DefaultRequestBinderRegistry implements RequestBinderRegistry {
         if (binder instanceof AnnotatedRequestArgumentBinder) {
             AnnotatedRequestArgumentBinder<?, ?> annotatedRequestArgumentBinder = (AnnotatedRequestArgumentBinder) binder;
             Class<? extends Annotation> annotationType = annotatedRequestArgumentBinder.getAnnotationType();
-            if (binder instanceof TypedRequestArgumentBinder) {
-                TypedRequestArgumentBinder<?> typedRequestArgumentBinder = (TypedRequestArgumentBinder) binder;
+            if (binder instanceof TypedRequestArgumentBinder<?> typedRequestArgumentBinder) {
                 Argument argumentType = typedRequestArgumentBinder.argumentType();
                 byTypeAndAnnotation.put(new TypeAndAnnotation(argumentType, annotationType), (RequestArgumentBinder) binder);
                 List<Class<?>> superTypes = typedRequestArgumentBinder.superTypes();
@@ -162,14 +161,13 @@ public class DefaultRequestBinderRegistry implements RequestBinderRegistry {
                 byAnnotation.put(annotationType, annotatedRequestArgumentBinder);
             }
 
-        } else if (binder instanceof TypedRequestArgumentBinder) {
-            TypedRequestArgumentBinder typedRequestArgumentBinder = (TypedRequestArgumentBinder) binder;
+        } else if (binder instanceof TypedRequestArgumentBinder typedRequestArgumentBinder) {
             byType.put(typedRequestArgumentBinder.argumentType().typeHashCode(), typedRequestArgumentBinder);
         }
     }
 
     @Override
-    public <T> Optional<ArgumentBinder<T, HttpRequest<?>>> findArgumentBinder(Argument<T> argument, HttpRequest<?> source) {
+    public <T> Optional<ArgumentBinder<T, HttpRequest<?>>> findArgumentBinder(Argument<T> argument) {
         Optional<Class<? extends Annotation>> opt = argument.getAnnotationMetadata().getAnnotationTypeByStereotype(Bindable.class);
         if (opt.isPresent()) {
             Class<? extends Annotation> annotationType = opt.get();
