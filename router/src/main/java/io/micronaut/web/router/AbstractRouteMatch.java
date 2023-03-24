@@ -29,7 +29,7 @@ import io.micronaut.http.HttpRequest;
 import io.micronaut.http.bind.RequestBinderRegistry;
 import io.micronaut.http.bind.binders.BodyArgumentBinder;
 import io.micronaut.http.bind.binders.NonBlockingBodyArgumentBinder;
-import io.micronaut.http.bind.binders.RequestBeanAnnotationBinder;
+import io.micronaut.http.bind.binders.PostponedRequestArgumentBinder;
 import io.micronaut.inject.ExecutableMethod;
 import io.micronaut.inject.MethodExecutionHandle;
 import io.micronaut.web.router.exceptions.UnsatisfiedRouteException;
@@ -333,7 +333,7 @@ abstract class AbstractRouteMatch<T, R> implements MethodBasedRouteMatch<T, R> {
                 lateBinders[index] = () -> argumentBinder.bind(conversionContext, request);
                 return;
             }
-        } else if (argumentBinder instanceof RequestBeanAnnotationBinder) {
+        } else if (argumentBinder instanceof PostponedRequestArgumentBinder) {
             lateBinders[index] = () -> argumentBinder.bind(conversionContext, request);
             return;
         } else {

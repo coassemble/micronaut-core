@@ -37,6 +37,8 @@ import jakarta.inject.Singleton;
 @Internal
 public class NettyRequestArgumentSatisfier extends RequestArgumentSatisfier {
 
+    private final RequestBinderRegistry requestBinderRegistry;
+
     /**
      * Constructor.
      *
@@ -44,14 +46,29 @@ public class NettyRequestArgumentSatisfier extends RequestArgumentSatisfier {
      */
     public NettyRequestArgumentSatisfier(RequestBinderRegistry requestBinderRegistry) {
         super(requestBinderRegistry);
+        this.requestBinderRegistry = requestBinderRegistry;
     }
 
     @Override
-    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request, boolean satisfyOptionals) {
+    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request) {
         if (request instanceof NettyHttpRequest<?> nettyHttpRequest) {
+//            if (route instanceof MethodBasedRouteInfo<?,?> methodBasedRouteInfo) {
+//                ArgumentBinder<?, HttpRequest<?>>[] resolveArgumentBinders = methodBasedRouteInfo.resolveArgumentBinders(requestBinderRegistry);
+//                String[] argumentNames = methodBasedRouteInfo.getArgumentNames();
+//                for (int i = 0; i < resolveArgumentBinders.length; i++) {
+//                    ArgumentBinder<?, HttpRequest<?>> argumentBinder = resolveArgumentBinders[i];
+//                    if (argumentBinder instanceof StreamingFileUploadBinder) {
+//                        nettyHttpRequest.getFileUpload().observeStreamingFileUpload(argumentNames[i]);
+//                    } else if (argumentBinder instanceof FileUpload) {
+//                        nettyHttpRequest.getFileUpload().observeStreamingFileUpload(argumentNames[i]);
+//                    }
+//                }
+//
+//
+//            }
             nettyHttpRequest.setBodyRequired(true);
         }
-        super.fulfillArgumentRequirements(route, request, satisfyOptionals);
+        super.fulfillArgumentRequirements(route, request);
     }
 
 }

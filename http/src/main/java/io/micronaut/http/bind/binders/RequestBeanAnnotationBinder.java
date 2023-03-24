@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * @param <T>
  */
 public class RequestBeanAnnotationBinder<T> extends AbstractAnnotatedArgumentBinder<RequestBean, T, HttpRequest<?>>
-        implements AnnotatedRequestArgumentBinder<RequestBean, T> {
+        implements AnnotatedRequestArgumentBinder<RequestBean, T>, PostponedRequestArgumentBinder {
 
     private final RequestBinderRegistry requestBinderRegistry;
 

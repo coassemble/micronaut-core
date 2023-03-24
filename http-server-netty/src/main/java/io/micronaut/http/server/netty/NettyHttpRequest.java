@@ -179,6 +179,9 @@ public class NettyHttpRequest<T> extends AbstractNettyHttpRequest<T> implements 
 
     private final BodyConvertor bodyConvertor = newBodyConvertor();
 
+    @Nullable
+    private NettyHttpFileUpload fileUpload;
+
     /**
      * @param nettyRequest        The {@link io.netty.handler.codec.http.HttpRequest}
      * @param ctx                 The {@link ChannelHandlerContext}
@@ -685,6 +688,13 @@ public class NettyHttpRequest<T> extends AbstractNettyHttpRequest<T> implements 
         } else {
             return contentLength;
         }
+    }
+
+    public NettyHttpFileUpload getFileUpload() {
+        if (fileUpload == null) {
+            fileUpload = new NettyHttpFileUpload();
+        }
+        return fileUpload;
     }
 
     /**

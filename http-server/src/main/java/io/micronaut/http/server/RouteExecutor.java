@@ -340,7 +340,7 @@ public final class RouteExecutor {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Found matching exception handler for exception [{}]: {}", cause.getMessage(), errorRoute);
             }
-            requestArgumentSatisfier.fulfillArgumentRequirements(errorRoute, httpRequest, false);
+            requestArgumentSatisfier.fulfillArgumentRequirements(errorRoute, httpRequest);
         }
 
         return errorRoute;

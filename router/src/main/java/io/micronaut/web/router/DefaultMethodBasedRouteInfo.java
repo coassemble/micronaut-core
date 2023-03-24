@@ -23,6 +23,7 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
     private final MethodExecutionHandle<T, R> targetMethod;
     private final String bodyArgumentName;
     private final Argument<?> bodyArgument;
+    private final String[] argumentNames;
     private final Map<String, Argument<?>> requiredInputs;
     private final boolean isVoid;
 
@@ -42,12 +43,15 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
         this.bodyArgument = bodyArgument;
         this.bodyArgumentName = bodyArgumentName;
 
-        Argument<?>[] requiredArguments = targetMethod.getArguments();
-        if (requiredArguments.length > 0) {
-            Map<String, Argument<?>> requiredInputs = CollectionUtils.newLinkedHashMap(requiredArguments.length);
-            for (Argument<?> requiredArgument : requiredArguments) {
+        Argument<?>[] arguments = targetMethod.getArguments();
+         argumentNames = new String[arguments.length];
+        if (arguments.length > 0) {
+            Map<String, Argument<?>> requiredInputs = CollectionUtils.newLinkedHashMap(arguments.length);
+            for (int i = 0; i < arguments.length; i++) {
+                Argument<?> requiredArgument = arguments[i];
                 String inputName = resolveInputName(requiredArgument);
                 requiredInputs.put(inputName, requiredArgument);
+                argumentNames[i] = inputName;
             }
             this.requiredInputs = Collections.unmodifiableMap(requiredInputs);
         } else {
@@ -97,8 +101,7 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
      * @param argument the argument
      * @return the name
      */
-    @Override
-    public @NonNull String resolveInputName(@NonNull Argument<?> argument) {
+    private static @NonNull String resolveInputName(@NonNull Argument<?> argument) {
         String inputName = argument.getAnnotationMetadata().stringValue(Bindable.NAME).orElse(null);
         if (StringUtils.isEmpty(inputName)) {
             inputName = argument.getName();
@@ -126,4 +129,8 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
         return requiredInputs;
     }
 
+    @Override
+    public String[] getArgumentNames() {
+        return argumentNames;
+    }
 }

@@ -50,11 +50,10 @@ public class RequestArgumentSatisfier {
     /**
      * Attempt to satisfy the arguments of the given route with the data from the given request.
      *
-     * @param route            The route
-     * @param request          The request
-     * @param satisfyOptionals Whether to satisfy optionals
+     * @param route   The route
+     * @param request The request
      */
-    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request, boolean satisfyOptionals) {
+    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request) {
         route.fulfill(binderRegistry, request);
     }
 

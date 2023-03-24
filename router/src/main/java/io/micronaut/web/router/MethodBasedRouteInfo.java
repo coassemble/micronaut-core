@@ -50,7 +50,7 @@ public interface MethodBasedRouteInfo<T, R> extends RouteInfo<R> {
     Map<String, Argument<?>> getRequiredInputs();
 
     @NonNull
-    String resolveInputName(@NonNull Argument<?> argument);
+    String[] getArgumentNames();
 
     ArgumentBinder<?, HttpRequest<?>>[] resolveArgumentBinders(RequestBinderRegistry requestBinderRegistry);
 

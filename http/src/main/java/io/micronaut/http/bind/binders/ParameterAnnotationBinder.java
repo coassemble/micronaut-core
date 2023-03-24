@@ -85,7 +85,7 @@ public class ParameterAnnotationBinder<T> extends AbstractAnnotatedArgumentBinde
             Optional<ConvertibleValues> body = source.getBody(ConvertibleValues.class);
             if (body.isPresent()) {
                 result = doBind(context, body.get(), parameterName);
-                if (!result.getValue().isPresent()) {
+                if (result.getValue().isEmpty()) {
                     if (ClassUtils.isJavaLangType(argumentType.getType())) {
                         return Optional::empty;
                     } else {

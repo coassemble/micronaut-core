@@ -50,8 +50,7 @@ public class RequestArgumentSatisfierBenchmark {
         final UriRouteMatch<Object, Object> routeMatch = router.find(request.getMethod(), request.getUri().toString(), request).findFirst().orElse(null);
         requestArgumentSatisfier.fulfillArgumentRequirements(
                 routeMatch,
-                request,
-                true
+                request
         );
     }
 
