@@ -63,6 +63,7 @@ abstract class AbstractRouteMatch<T, R> implements MethodBasedRouteMatch<T, R> {
     private final Object[] argumentValues;
     private final Supplier<ArgumentBinder.BindingResult<?>>[] lateBinders;
     private final boolean[] fulfilledArguments;
+    private final boolean[] forcedFulfilledArguments;
     private boolean fulfilled;
     private boolean bindersApplied;
 
@@ -85,10 +86,12 @@ abstract class AbstractRouteMatch<T, R> implements MethodBasedRouteMatch<T, R> {
             this.argumentValues = null;
             this.fulfilledArguments = null;
             this.lateBinders = null;
+            this.forcedFulfilledArguments = null;
         } else {
             this.lateBinders = new Supplier[length];
             this.argumentValues = new Object[length];
             this.fulfilledArguments = new boolean[length];
+            this.forcedFulfilledArguments = new boolean[length];
         }
     }
 
@@ -147,7 +150,7 @@ abstract class AbstractRouteMatch<T, R> implements MethodBasedRouteMatch<T, R> {
         for (int i = 0; i < argumentNames.length; i++) {
             String argumentName = argumentNames[i];
             if (name.equals(argumentName)) {
-                return fulfilledArguments[i];
+                return fulfilledArguments[i] || forcedFulfilledArguments[i];
             }
         }
         return false;
@@ -264,11 +267,12 @@ abstract class AbstractRouteMatch<T, R> implements MethodBasedRouteMatch<T, R> {
     @Override
     public void fulfillOnExecute(String argumentName, Supplier<Object> argumentValueSupplier) {
         for (int i = 0; i < argumentNames.length; i++) {
-            if (fulfilledArguments[i]) {
+            if (fulfilledArguments[i] || forcedFulfilledArguments[i]) {
                 continue;
             }
             if (argumentNames[i].equals(argumentName)) {
                 lateBinders[i] = () -> () -> Optional.ofNullable(argumentValueSupplier.get());
+                forcedFulfilledArguments[i] = true;
                 return;
             }
         }

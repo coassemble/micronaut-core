@@ -242,11 +242,10 @@ final class FormRouteCompleter extends BaseRouteCompleter {
         }
 
         if (!execute) {
-            String argumentName = argument.getName();
-            if (!routeMatch.isSatisfied(argumentName)) {
+            if (!routeMatch.isSatisfied(name)) {
                 // Fulfill the value on execute when the body is fully read
                 // The file uploads needs to be completed
-                routeMatch.fulfillOnExecute(argumentName, value);
+                routeMatch.fulfillOnExecute(name, value);
                 // we need to release the data here. However, if the route argument is a
                 // ByteBuffer, we need to retain the data until the route is executed. Adding
                 // the data to the request ensures it is cleaned up after the route completes.
