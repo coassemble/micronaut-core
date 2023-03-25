@@ -80,7 +80,7 @@ class GroovyRouteBuilderSpec extends Specification {
 
         def route = router.route(ErrorHandlingController, bean).get()
         expect:
-        route.fulfill(requestBinderRegistry, Mock(HttpRequest))
+        route.fulfillBeforeFilters(requestBinderRegistry, Mock(HttpRequest))
         route.execute() == result
 
         cleanup:

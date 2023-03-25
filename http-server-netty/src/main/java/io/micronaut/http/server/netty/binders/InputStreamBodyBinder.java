@@ -77,6 +77,9 @@ public class InputStreamBodyBinder implements NonBlockingBodyArgumentBinder<Inpu
     public BindingResult<InputStream> bindForStreamedNettyRequest(ArgumentConversionContext<InputStream> context,
                                                                   StreamedHttpRequest streamedHttpRequest,
                                                                   NettyHttpRequest<?> nettyHttpRequest) {
+
+        nettyHttpRequest.setUsesHttpContentProcessor();
+
         PipedOutputStream outputStream = new PipedOutputStream();
         try {
             PipedInputStream inputStream = new PipedInputStream(outputStream) {

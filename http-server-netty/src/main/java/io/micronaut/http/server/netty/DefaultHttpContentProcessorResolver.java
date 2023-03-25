@@ -75,7 +75,7 @@ class DefaultHttpContentProcessorResolver implements HttpContentProcessorResolve
     @Override
     @NonNull
     public HttpContentProcessor resolve(@NonNull NettyHttpRequest<?> request, @NonNull RouteMatch<?> route) {
-        Argument<?> bodyType = route.getBodyArgument()
+        Argument<?> bodyType = route.getRouteInfo().getBodyArgument()
                 /*
                 The getBodyArgument() method returns arguments for functions where it is
                 not possible to dictate whether the argument is supposed to bind the entire

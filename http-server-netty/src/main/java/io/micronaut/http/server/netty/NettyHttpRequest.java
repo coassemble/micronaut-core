@@ -78,6 +78,8 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -180,7 +182,9 @@ public class NettyHttpRequest<T> extends AbstractNettyHttpRequest<T> implements 
     private final BodyConvertor bodyConvertor = newBodyConvertor();
 
     @Nullable
-    private NettyHttpFileUpload fileUpload;
+    private Sinks.Many<MicronautHttpData<?>> fileUploadSink;
+
+    private boolean usesHttpContentProcessor;
 
     /**
      * @param nettyRequest        The {@link io.netty.handler.codec.http.HttpRequest}
@@ -462,15 +466,22 @@ public class NettyHttpRequest<T> extends AbstractNettyHttpRequest<T> implements 
     @Internal
     public void addContent(ByteBufHolder httpContent) {
         httpContent.touch();
-        if (httpContent instanceof MicronautHttpData<?>) {
-            receivedData.computeIfAbsent(new IdentityWrapper(httpContent), key -> {
-                // released in release()
-                httpContent.retain();
-                return (HttpData) httpContent;
-            });
+        if (httpContent instanceof MicronautHttpData<?> micronautHttpData) {
+            addContent(micronautHttpData);
         } else {
             // released in release()
             receivedContent.add(httpContent.retain());
+        }
+    }
+
+    private void addContent(MicronautHttpData<?> httpContent) {
+        receivedData.computeIfAbsent(new IdentityWrapper(httpContent), key -> {
+            // released in release()
+            httpContent.retain();
+            return httpContent;
+        });
+        if (fileUploadSink != null) {
+            fileUploadSink.emitNext(httpContent, Sinks.EmitFailureHandler.FAIL_FAST);
         }
     }
 
@@ -690,11 +701,23 @@ public class NettyHttpRequest<T> extends AbstractNettyHttpRequest<T> implements 
         }
     }
 
-    public NettyHttpFileUpload getFileUpload() {
-        if (fileUpload == null) {
-            fileUpload = new NettyHttpFileUpload();
+    public Flux<MicronautHttpData<?>> getFileUploadObserver() {
+        if (fileUploadSink == null) {
+            fileUploadSink = Sinks.many().multicast().onBackpressureBuffer();
         }
-        return fileUpload;
+        return fileUploadSink.asFlux();
+    }
+
+    public boolean hasFileUploadObservers() {
+        return fileUploadSink != null;
+    }
+
+    public void setUsesHttpContentProcessor() {
+        usesHttpContentProcessor = true;
+    }
+
+    public boolean isUsingHttpContentProcessor() {
+        return usesHttpContentProcessor;
     }
 
     /**

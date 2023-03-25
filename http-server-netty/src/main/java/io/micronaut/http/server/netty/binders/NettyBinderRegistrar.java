@@ -26,6 +26,7 @@ import io.micronaut.http.bind.RequestBinderRegistry;
 import io.micronaut.http.server.HttpServerConfiguration;
 import io.micronaut.http.server.netty.HttpContentProcessorResolver;
 import io.micronaut.http.server.netty.multipart.MultipartBodyArgumentBinder;
+import io.micronaut.http.server.netty.multipart.NettyStreamingFileUpload;
 import io.micronaut.scheduling.TaskExecutors;
 import jakarta.inject.Named;
 
@@ -50,7 +51,6 @@ class NettyBinderRegistrar implements BeanCreatedEventListener<RequestBinderRegi
     /**
      * Default constructor.
      *
-     * @param conversionService            The conversion service
      * @param httpContentProcessorResolver The processor resolver
      * @param beanLocator                  The bean locator
      * @param httpServerConfiguration      The server config
@@ -81,6 +81,13 @@ class NettyBinderRegistrar implements BeanCreatedEventListener<RequestBinderRegi
         registry.addRequestArgumentBinder(new InputStreamBodyBinder(
                 httpContentProcessorResolver,
                 executorService.get()
+        ));
+        registry.addRequestArgumentBinder(new StreamingFileUploadBinder(
+            conversionService,
+            new NettyStreamingFileUpload.Factory(httpServerConfiguration.get().getMultipart(), executorService.get()))
+        );
+        registry.addRequestArgumentBinder(new CompletedFileUploadBinder(
+            conversionService
         ));
         return registry;
     }

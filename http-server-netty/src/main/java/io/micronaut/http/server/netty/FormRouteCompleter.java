@@ -122,14 +122,14 @@ final class FormRouteCompleter extends BaseRouteCompleter {
         }
 
         String name = data.getName();
-        Optional<Argument<?>> requiredInput = routeMatch.getRequiredInput(name);
 
-        if (requiredInput.isEmpty()) {
+        if (true && !request.destroyed) {
             request.addContent(data);
             request(1);
             return;
         }
 
+        Optional<Argument<?>> requiredInput = routeMatch.getRequiredInput(name);
         Argument<?> argument = requiredInput.get();
         Supplier<Object> value;
         boolean isPublisher = Publishers.isConvertibleToPublisher(argument.getType());

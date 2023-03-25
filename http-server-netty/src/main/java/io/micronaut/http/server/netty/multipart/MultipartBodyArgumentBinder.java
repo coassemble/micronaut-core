@@ -79,7 +79,9 @@ public class MultipartBodyArgumentBinder implements NonBlockingBodyArgumentBinde
         HttpContentProcessor processor = beanLocator.findBean(HttpContentSubscriberFactory.class,
                 new ConsumesMediaTypeQualifier<>(MediaType.MULTIPART_FORM_DATA_TYPE))
             .map(factory -> factory.build(nettyHttpRequest))
-            .orElse(new DefaultHttpContentProcessor(nettyHttpRequest, httpServerConfiguration.get()));
+            .orElseGet(() -> new DefaultHttpContentProcessor(nettyHttpRequest, httpServerConfiguration.get()));
+
+        nettyHttpRequest.setUsesHttpContentProcessor();
 
         return () -> Optional.of(subscriber -> HttpContentProcessorAsReactiveProcessor.<HttpData>asPublisher(processor.resultType(context.getArgument()), nettyHttpRequest).subscribe(new CompletionAwareSubscriber<>() {
 

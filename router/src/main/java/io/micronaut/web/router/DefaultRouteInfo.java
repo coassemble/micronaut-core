@@ -127,6 +127,10 @@ public class DefaultRouteInfo<R> implements RouteInfo<R> {
         return returnType.asArgument();
     }
 
+    @Override
+    public Optional<Argument<?>> getBodyArgument() {
+        return Optional.empty();
+    }
 
     @Override
     public ReturnType<? extends R> getReturnType() {

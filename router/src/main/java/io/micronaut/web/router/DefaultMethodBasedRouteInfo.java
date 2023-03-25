@@ -21,11 +21,10 @@ import java.util.Optional;
 public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> implements MethodBasedRouteInfo<T, R> {
 
     private final MethodExecutionHandle<T, R> targetMethod;
-    private final String bodyArgumentName;
-    private final Argument<?> bodyArgument;
     private final String[] argumentNames;
     private final Map<String, Argument<?>> requiredInputs;
     private final boolean isVoid;
+    private final Optional<Argument<?>> optionalBodyArgument;
 
     private ArgumentBinder<?, HttpRequest<?>>[] argumentBinders;
 
@@ -40,8 +39,6 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
                                        boolean isErrorRoute) {
         super(targetMethod, targetMethod.getReturnType(), consumesMediaTypes, producesMediaTypes, targetMethod.getDeclaringType(), isErrorRoute, isPermitsBody);
         this.targetMethod = targetMethod;
-        this.bodyArgument = bodyArgument;
-        this.bodyArgumentName = bodyArgumentName;
 
         Argument<?>[] arguments = targetMethod.getArguments();
          argumentNames = new String[arguments.length];
@@ -63,6 +60,13 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
             isVoid = KotlinExecutableMethodUtils.isKotlinFunctionReturnTypeUnit(targetMethod.getExecutableMethod());
         } else {
             isVoid = false;
+        }
+        if (bodyArgument != null) {
+            optionalBodyArgument = Optional.of(bodyArgument);
+        } else if (bodyArgumentName != null) {
+            optionalBodyArgument = Optional.ofNullable(requiredInputs.get(bodyArgumentName));
+        } else {
+            optionalBodyArgument = Optional.empty();
         }
     }
 
@@ -115,18 +119,8 @@ public class DefaultMethodBasedRouteInfo<T, R> extends DefaultRouteInfo<R> imple
     }
 
     @Override
-    public Argument<?> getBodyArgument() {
-        return bodyArgument;
-    }
-
-    @Override
-    public String getBodyArgumentName() {
-        return bodyArgumentName;
-    }
-
-    @Override
-    public Map<String, Argument<?>> getRequiredInputs() {
-        return requiredInputs;
+    public Optional<Argument<?>> getBodyArgument() {
+        return optionalBodyArgument;
     }
 
     @Override

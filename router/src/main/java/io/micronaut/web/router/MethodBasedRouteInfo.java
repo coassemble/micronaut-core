@@ -16,14 +16,10 @@
 package io.micronaut.web.router;
 
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.annotation.Nullable;
 import io.micronaut.core.bind.ArgumentBinder;
-import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.bind.RequestBinderRegistry;
 import io.micronaut.inject.MethodExecutionHandle;
-
-import java.util.Map;
 
 /**
  * Represents a route that is backed by a method.
@@ -39,15 +35,6 @@ public interface MethodBasedRouteInfo<T, R> extends RouteInfo<R> {
      * @return The {@link MethodExecutionHandle}
      */
     MethodExecutionHandle<T, R> getTargetMethod();
-
-    @Nullable
-    Argument<?> getBodyArgument();
-
-    @Nullable
-    String getBodyArgumentName();
-
-    @NonNull
-    Map<String, Argument<?>> getRequiredInputs();
 
     @NonNull
     String[] getArgumentNames();

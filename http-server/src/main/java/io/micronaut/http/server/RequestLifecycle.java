@@ -404,7 +404,7 @@ public class RequestLifecycle {
      */
     protected ExecutionFlow<RouteMatch<?>> fulfillArguments(RouteMatch<?> routeMatch) {
         // try to fulfill the argument requirements of the route
-        routeExecutor.requestArgumentSatisfier.fulfillArgumentRequirements(routeMatch, request());
+        routeExecutor.requestArgumentSatisfier.fulfillArgumentRequirementsBeforeFilters(routeMatch, request());
         return ExecutionFlow.just(routeMatch);
     }
 }

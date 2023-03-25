@@ -50,7 +50,7 @@ public class NettyRequestArgumentSatisfier extends RequestArgumentSatisfier {
     }
 
     @Override
-    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request) {
+    public void fulfillArgumentRequirementsBeforeFilters(RouteMatch<?> route, HttpRequest<?> request) {
         if (request instanceof NettyHttpRequest<?> nettyHttpRequest) {
 //            if (route instanceof MethodBasedRouteInfo<?,?> methodBasedRouteInfo) {
 //                ArgumentBinder<?, HttpRequest<?>>[] resolveArgumentBinders = methodBasedRouteInfo.resolveArgumentBinders(requestBinderRegistry);
@@ -68,7 +68,7 @@ public class NettyRequestArgumentSatisfier extends RequestArgumentSatisfier {
 //            }
             nettyHttpRequest.setBodyRequired(true);
         }
-        super.fulfillArgumentRequirements(route, request);
+        super.fulfillArgumentRequirementsBeforeFilters(route, request);
     }
 
 }

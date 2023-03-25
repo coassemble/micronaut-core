@@ -67,7 +67,16 @@ public interface RouteMatch<R> extends Callable<R>, AnnotationMetadataProvider {
      * @param request               The request
      * @since 4.0.0
      */
-    void fulfill(RequestBinderRegistry requestBinderRegistry, HttpRequest<?> request);
+    void fulfillBeforeFilters(RequestBinderRegistry requestBinderRegistry, HttpRequest<?> request);
+
+    /**
+     * Attempt to satisfy the arguments of the given route with the data from the given request.
+     *
+     * @param requestBinderRegistry The request binder registry
+     * @param request               The request
+     * @since 4.0.0
+     */
+    void fulfillAfterFilters(RequestBinderRegistry requestBinderRegistry, HttpRequest<?> request);
 
     /**
      * @return Whether the route match can be executed without passing any additional arguments ie. via
@@ -83,11 +92,6 @@ public interface RouteMatch<R> extends Callable<R>, AnnotationMetadataProvider {
      * @return True if it is
      */
     Optional<Argument<?>> getRequiredInput(String name);
-
-    /**
-     * @return The argument that represents the body
-     */
-    Optional<Argument<?>> getBodyArgument();
 
     /**
      * <p>Returns the required arguments for this RouteMatch.</p>

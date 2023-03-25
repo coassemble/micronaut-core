@@ -619,7 +619,7 @@ public abstract sealed class MicronautHttpData<D extends HttpData> extends Abstr
          *
          * @return The contents of this chunk
          */
-        ByteBuf claim() {
+        public ByteBuf claim() {
             lock.lock();
             if (buf == null) {
                 return Unpooled.EMPTY_BUFFER;

@@ -53,8 +53,18 @@ public class RequestArgumentSatisfier {
      * @param route   The route
      * @param request The request
      */
-    public void fulfillArgumentRequirements(RouteMatch<?> route, HttpRequest<?> request) {
-        route.fulfill(binderRegistry, request);
+    public void fulfillArgumentRequirementsBeforeFilters(RouteMatch<?> route, HttpRequest<?> request) {
+        route.fulfillBeforeFilters(binderRegistry, request);
+    }
+
+    /**
+     * Attempt to satisfy the arguments of the given route with the data from the given request.
+     *
+     * @param route   The route
+     * @param request The request
+     */
+    public void fulfillArgumentRequirementsAfterFilters(RouteMatch<?> route, HttpRequest<?> request) {
+        route.fulfillAfterFilters(binderRegistry, request);
     }
 
 }

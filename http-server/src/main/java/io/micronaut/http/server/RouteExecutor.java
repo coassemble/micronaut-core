@@ -340,7 +340,7 @@ public final class RouteExecutor {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Found matching exception handler for exception [{}]: {}", cause.getMessage(), errorRoute);
             }
-            requestArgumentSatisfier.fulfillArgumentRequirements(errorRoute, httpRequest);
+            requestArgumentSatisfier.fulfillArgumentRequirementsBeforeFilters(errorRoute, httpRequest);
         }
 
         return errorRoute;
@@ -459,10 +459,7 @@ public final class RouteExecutor {
 
     private ExecutionFlow<MutableHttpResponse<?>> executeRouteAndConvertBody(RouteMatch<?> routeMatch, HttpRequest<?> httpRequest) {
         try {
-            // ensure the route requirements are completely satisfied
-//            if (!routeMatch.isFulfilled()) {
-//                requestArgumentSatisfier.fulfillArgumentRequirements(routeMatch, httpRequest, true);
-//            }
+            requestArgumentSatisfier.fulfillArgumentRequirementsAfterFilters(routeMatch, httpRequest);
             Object body = ServerRequestContext.with(httpRequest, (Supplier<Object>) routeMatch::execute);
             if (body instanceof Optional) {
                 body = ((Optional<?>) body).orElse(null);

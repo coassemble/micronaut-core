@@ -48,7 +48,7 @@ public class RequestArgumentSatisfierBenchmark {
     public void benchmarkFulfillArgumentRequirements() {
         final MutableHttpRequest<Object> request = HttpRequest.GET("/arguments/foo/bar/10");
         final UriRouteMatch<Object, Object> routeMatch = router.find(request.getMethod(), request.getUri().toString(), request).findFirst().orElse(null);
-        requestArgumentSatisfier.fulfillArgumentRequirements(
+        requestArgumentSatisfier.fulfillArgumentRequirementsBeforeFilters(
                 routeMatch,
                 request
         );

@@ -139,17 +139,26 @@ final class NettyRequestLifecycle extends RequestLifecycle {
      * This method also sometimes fulfills more controller parameters with form data.
      */
     private ExecutionFlow<RouteMatch<?>> waitForBody(RouteMatch<?> routeMatch) {
-        if (!shouldReadBody(routeMatch)) {
+        if (nettyRequest.isUsingHttpContentProcessor()) {
             ctx.read();
             return ExecutionFlow.just(routeMatch);
         }
-        BaseRouteCompleter completer = nettyRequest.isFormOrMultipartData() ?
-            new FormRouteCompleter(new NettyStreamingFileUpload.Factory(rib.serverConfiguration.getMultipart(), rib.getIoExecutor()), rib.conversionService, nettyRequest, routeMatch) :
-            new BaseRouteCompleter(nettyRequest, routeMatch);
-        HttpContentProcessor processor = rib.httpContentProcessorResolver.resolve(nettyRequest, routeMatch);
-        StreamingDataSubscriber pr = new StreamingDataSubscriber(completer, processor);
-        ((StreamedHttpRequest) nettyRequest.getNativeRequest()).subscribe(pr);
-        return pr.completion;
+        if (nettyRequest.isFormOrMultipartData() && nettyRequest.hasFileUploadObservers()) {
+            BaseRouteCompleter completer = new FormRouteCompleter(new NettyStreamingFileUpload.Factory(rib.serverConfiguration.getMultipart(), rib.getIoExecutor()), rib.conversionService, nettyRequest, routeMatch);
+            HttpContentProcessor processor = rib.httpContentProcessorResolver.resolve(nettyRequest, routeMatch);
+            StreamingDataSubscriber pr = new StreamingDataSubscriber(completer, processor);
+            ((StreamedHttpRequest) nettyRequest.getNativeRequest()).subscribe(pr);
+            return pr.completion;
+        }
+        if ((!routeMatch.isFulfilled() || hasArg(methodBasedRouteMatch, HttpRequest.class)) && nettyRequest.getNativeRequest() instanceof StreamedHttpRequest) {
+            BaseRouteCompleter completer = new BaseRouteCompleter(nettyRequest, routeMatch);
+            HttpContentProcessor processor = rib.httpContentProcessorResolver.resolve(nettyRequest, routeMatch);
+            StreamingDataSubscriber pr = new StreamingDataSubscriber(completer, processor);
+            ((StreamedHttpRequest) nettyRequest.getNativeRequest()).subscribe(pr);
+            return pr.completion;
+        }
+        ctx.read();
+        return ExecutionFlow.just(routeMatch);
     }
 
     void handleException(Throwable cause) {
@@ -174,7 +183,7 @@ final class NettyRequestLifecycle extends RequestLifecycle {
                 return true;
             }
         }
-        Optional<Argument<?>> bodyArgument = routeMatch.getBodyArgument()
+        Optional<Argument<?>> bodyArgument = routeMatch.getRouteInfo().getBodyArgument()
             .filter(argument -> argument.getAnnotationMetadata().hasAnnotation(Body.class));
         if (bodyArgument.isPresent() && !routeMatch.isSatisfied(bodyArgument.get().getName())) {
             // Body argument in the method

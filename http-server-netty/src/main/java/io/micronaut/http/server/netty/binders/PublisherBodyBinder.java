@@ -78,6 +78,7 @@ public class PublisherBodyBinder implements NonBlockingBodyArgumentBinder<Publis
                                                                    NettyHttpRequest<?> nettyHttpRequest) {
         Argument<?> targetType = context.getFirstTypeVariable().orElse(Argument.OBJECT_ARGUMENT);
 
+        nettyHttpRequest.setUsesHttpContentProcessor();
         HttpContentProcessor processor = httpContentProcessorResolver.resolve(nettyHttpRequest, targetType);
 
         return () -> Optional.of(subscriber -> HttpContentProcessorAsReactiveProcessor.asPublisher(processor.resultType(context.getArgument()), nettyHttpRequest).subscribe(new CompletionAwareSubscriber<>() {

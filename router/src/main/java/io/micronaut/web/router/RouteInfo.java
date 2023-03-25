@@ -26,6 +26,7 @@ import io.micronaut.http.MediaType;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Common information shared between route and route match.
@@ -50,6 +51,11 @@ public interface RouteInfo<R> extends AnnotationMetadataProvider {
      * @return The argument representing the data type being produced.
      */
     Argument<?> getBodyType();
+
+    /**
+     * @return The argument that represents the body
+     */
+    Optional<Argument<?>> getBodyArgument();
 
     /**
      * @return The declaring type of the route.

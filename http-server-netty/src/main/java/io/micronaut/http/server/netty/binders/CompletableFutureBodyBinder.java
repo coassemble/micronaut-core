@@ -75,6 +75,7 @@ public class CompletableFutureBodyBinder implements NonBlockingBodyArgumentBinde
         CompletableFuture<Object> future = new CompletableFuture<>();
         Argument<?> targetType = context.getFirstTypeVariable().orElse(Argument.OBJECT_ARGUMENT);
 
+        nettyHttpRequest.setUsesHttpContentProcessor();
         HttpContentProcessor processor = httpContentProcessorResolver.resolve(nettyHttpRequest, targetType);
 
         HttpContentProcessorAsReactiveProcessor.asPublisher(processor, nettyHttpRequest).subscribe(new CompletionAwareSubscriber<>() {
