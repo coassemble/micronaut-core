@@ -56,6 +56,9 @@ final class ImmutableSortedStringsArrayMap<V> implements Map<String, V> {
 
     private static int[] computeIndex(String[] keys) {
         int len = keys.length;
+        if (len < 2) {
+            return new int[0];
+        }
         int[] filter = new int[8 * len];
         Arrays.fill(filter, (byte) -1);
         for (int i = 0; i < keys.length; i++) {
@@ -71,11 +74,18 @@ final class ImmutableSortedStringsArrayMap<V> implements Map<String, V> {
     }
 
     private int findKeyIndex(Object key) {
+        int length = keys.length;
+        if (length == 0) {
+            return -1;
+        }
+        if (length == 1) {
+            return keys[0].equals(key) ? 0 : -1;
+        }
         // Performance optimization to check for the String first to avoid the type-check pollution
         if (!(key instanceof String) && !(key instanceof Comparable)) {
             return -1;
         }
-        int v = index[reduceHashCode(key.hashCode(), keys.length)];
+        int v = index[reduceHashCode(key.hashCode(), length)];
         if (v < 0) {
             // Bloom filter will be more efficient if the index is sparse
             // that is to say that it contains more -1 than positive values

@@ -262,7 +262,7 @@ public class AnnotationUtil {
         if (value == Collections.EMPTY_MAP) {
             return INTERN_MAP_POOL.computeIfAbsent(key, s -> Collections.singletonMap(s, Collections.emptyMap()));
         }
-        return Collections.singletonMap(key, value);
+        return new ImmutableSortedStringsArrayMap(new String[]{key}, new Object[]{value});
     }
 
     /**
@@ -279,7 +279,7 @@ public class AnnotationUtil {
             throw new IllegalArgumentException("Number of arguments should be an even number representing the keys and values");
         }
         if (array.length == 0) {
-            return Collections.EMPTY_MAP;
+            return new ImmutableSortedStringsArrayMap(new String[0], new Object[0]);
         }
         int size = len / 2;
         String[] keys = new String[size];
@@ -303,7 +303,7 @@ public class AnnotationUtil {
      */
     @UsedByGeneratedCode
     public static Map<String, Object> mapOf(String key1, Object value1) {
-        return Collections.singletonMap(key1, value1);
+        return new ImmutableSortedStringsArrayMap(new String[]{key1}, new Object[]{value1});
     }
 
     /**

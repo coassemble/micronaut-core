@@ -47,20 +47,19 @@ public class CompletedFileUploadBinder implements TypedRequestArgumentBinder<Com
 
             @Override
             public void onSubscribe(Subscription subscription) {
-                subscription.request(Long.MAX_VALUE);
+                this.subscription = subscription;
+                subscription.request(1);
             }
 
             @Override
             public void onNext(MicronautHttpData<?> data) {
-                if (!data.getName().equals(inputName)) {
-                    return;
-                }
-
-                if (!completableFuture.isDone() && data instanceof io.netty.handler.codec.http.multipart.FileUpload fileUpload) {
+                if (data.getName().equals(inputName) && !completableFuture.isDone() && data instanceof io.netty.handler.codec.http.multipart.FileUpload fileUpload) {
                     completableFuture.complete(
                         conversionService.convertRequired(fileUpload, CompletedFileUpload.class)
                     );
                     subscription.cancel();
+                } else {
+                    subscription.request(1);
                 }
             }
 

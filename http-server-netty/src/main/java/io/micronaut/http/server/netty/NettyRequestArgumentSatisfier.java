@@ -51,23 +51,6 @@ public class NettyRequestArgumentSatisfier extends RequestArgumentSatisfier {
 
     @Override
     public void fulfillArgumentRequirementsBeforeFilters(RouteMatch<?> route, HttpRequest<?> request) {
-        if (request instanceof NettyHttpRequest<?> nettyHttpRequest) {
-//            if (route instanceof MethodBasedRouteInfo<?,?> methodBasedRouteInfo) {
-//                ArgumentBinder<?, HttpRequest<?>>[] resolveArgumentBinders = methodBasedRouteInfo.resolveArgumentBinders(requestBinderRegistry);
-//                String[] argumentNames = methodBasedRouteInfo.getArgumentNames();
-//                for (int i = 0; i < resolveArgumentBinders.length; i++) {
-//                    ArgumentBinder<?, HttpRequest<?>> argumentBinder = resolveArgumentBinders[i];
-//                    if (argumentBinder instanceof StreamingFileUploadBinder) {
-//                        nettyHttpRequest.getFileUpload().observeStreamingFileUpload(argumentNames[i]);
-//                    } else if (argumentBinder instanceof FileUpload) {
-//                        nettyHttpRequest.getFileUpload().observeStreamingFileUpload(argumentNames[i]);
-//                    }
-//                }
-//
-//
-//            }
-            nettyHttpRequest.setBodyRequired(true);
-        }
         super.fulfillArgumentRequirementsBeforeFilters(route, request);
     }
 

@@ -29,7 +29,6 @@ import io.micronaut.http.annotation.Body;
 import io.micronaut.http.context.ServerRequestContext;
 import io.micronaut.http.netty.stream.StreamedHttpRequest;
 import io.micronaut.http.server.RequestLifecycle;
-import io.micronaut.http.server.multipart.MultipartBody;
 import io.micronaut.http.server.netty.multipart.NettyStreamingFileUpload;
 import io.micronaut.http.server.netty.types.files.NettyStreamedFileCustomizableResponseType;
 import io.micronaut.http.server.netty.types.files.NettySystemFileCustomizableResponseType;
@@ -150,7 +149,7 @@ final class NettyRequestLifecycle extends RequestLifecycle {
             ((StreamedHttpRequest) nettyRequest.getNativeRequest()).subscribe(pr);
             return pr.completion;
         }
-        if ((!routeMatch.isFulfilled() || hasArg(methodBasedRouteMatch, HttpRequest.class)) && nettyRequest.getNativeRequest() instanceof StreamedHttpRequest) {
+        if (needsBody(routeMatch)) {
             BaseRouteCompleter completer = new BaseRouteCompleter(nettyRequest, routeMatch);
             HttpContentProcessor processor = rib.httpContentProcessorResolver.resolve(nettyRequest, routeMatch);
             StreamingDataSubscriber pr = new StreamingDataSubscriber(completer, processor);
@@ -165,7 +164,7 @@ final class NettyRequestLifecycle extends RequestLifecycle {
         onError(cause).onComplete((response, throwable) -> rib.writeResponse(ctx, nettyRequest, response, throwable));
     }
 
-    private boolean shouldReadBody(RouteMatch<?> routeMatch) {
+    private boolean needsBody(RouteMatch<?> routeMatch) {
         if (!routeMatch.getRouteInfo().isPermitsRequestBody()) {
             return false;
         }
@@ -174,22 +173,16 @@ final class NettyRequestLifecycle extends RequestLifecycle {
             return false;
         }
         if (routeMatch instanceof MethodBasedRouteMatch<?, ?> methodBasedRouteMatch) {
-            if (hasArg(methodBasedRouteMatch, MultipartBody.class)) {
-                // MultipartBody will subscribe to the request body in MultipartBodyArgumentBinder
-                return false;
-            }
             if (hasArg(methodBasedRouteMatch, HttpRequest.class)) {
                 // HttpRequest argument in the method
                 return true;
             }
         }
-        Optional<Argument<?>> bodyArgument = routeMatch.getRouteInfo().getBodyArgument()
-            .filter(argument -> argument.getAnnotationMetadata().hasAnnotation(Body.class));
-        if (bodyArgument.isPresent() && !routeMatch.isSatisfied(bodyArgument.get().getName())) {
+        if (routeMatch.getRouteInfo().getBodyArgument().isPresent()) {
             // Body argument in the method
             return true;
         }
-        // Might be some body parts
+        // Not annotated body argument
         return !routeMatch.isFulfilled();
     }
 
