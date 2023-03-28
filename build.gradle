@@ -3,6 +3,7 @@ plugins {
     id "io.micronaut.build.internal.dependency-updates"
     id "io.micronaut.build.internal.version-catalog-updates"
     id "io.micronaut.build.internal.convention-quality"
+    id "maven-publish"
 }
 
 tasks.named("updateVersionCatalogs") {
@@ -29,6 +30,19 @@ if (System.getenv("SONAR_TOKEN") != null) {
     sonarqube {
         properties {
             property "sonar.exclusions", coverageExcludes.join(",")
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/coassemble/micronaut-core"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
         }
     }
 }
