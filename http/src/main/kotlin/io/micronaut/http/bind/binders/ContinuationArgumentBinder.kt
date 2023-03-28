@@ -40,6 +40,13 @@ class ContinuationArgumentBinder : TypedRequestArgumentBinder<Continuation<*>> {
         context: ArgumentConversionContext<Continuation<*>>?,
         source: HttpRequest<*>
     ): ArgumentBinder.BindingResult<Continuation<*>> {
+        val optCc = source.getAttribute(CONTINUATION_ARGUMENT_ATTRIBUTE_KEY)
+        if (optCc.isPresent) {
+            val optCcVal = optCc.get()
+            if (optCcVal is Continuation<*>) {
+                return ArgumentBinder.BindingResult { Optional.of(optCcVal) }
+            }
+        }
         val cc = CustomContinuation()
         source.setAttribute(CONTINUATION_ARGUMENT_ATTRIBUTE_KEY, cc)
         return ArgumentBinder.BindingResult { Optional.of(cc) }
