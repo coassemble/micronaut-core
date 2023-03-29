@@ -1,10 +1,13 @@
 name: Publish package to GitHub Packages
 on:
-  release:
-    types: [created]
+  workflow_call:
+  workflow_dispatch:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
